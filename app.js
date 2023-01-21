@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const { ObjectId } = require("mongodb");
 const { connectToDb, getDb } = require("./db");
 const logger = require("./logger");
 
@@ -41,8 +42,6 @@ app.post("/orders", async (req, res, next) => {
   try {
     const order = req.body
 
-    console.log(order)
-
     const db = getDb();
     const collection = db.collection("orders");
     
@@ -55,3 +54,21 @@ app.post("/orders", async (req, res, next) => {
     next(err);
   }
 });
+
+app.put("/lessons/:id", (req, res) => {
+  const lessonId = req.params.id
+  const spaces = req.body.spaces
+
+  const db = getDb();
+  const collection = db.collection("lessons");
+
+  collection.findOneAndUpdate(
+    { _id: ObjectId(lessonId) },
+    { $inc: { 'spaces': -spaces } },
+    (err, result) => {
+      if (err) throw err 
+      
+      res.send("Lesson updated successfully")
+  })
+  
+})
