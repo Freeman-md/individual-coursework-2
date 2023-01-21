@@ -29,7 +29,7 @@ connectToDb()
 
 const updateLesson = (lessonId, spaces) => {
   const db = getDb();
-  const collection = db.collection("lessons");
+  const collection = db.collection("lesson");
 
   collection.findOneAndUpdate(
     { _id: ObjectId(lessonId) },
@@ -56,7 +56,7 @@ app.post("/orders", async (req, res, next) => {
     const order = req.body;
 
     const db = getDb();
-    const collection = db.collection("orders");
+    const collection = db.collection("order");
 
     collection.insertOne(order, (err, result) => {
       if (err) throw err;
