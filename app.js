@@ -1,36 +1,34 @@
 const express = require("express");
 const cors = require("cors");
+const { connectToDb, getDb } = require("./db");
 
 const app = express();
 
 app.use(express.static("public"));
 app.use(cors());
 
-app.get("/lessons", (request, response) => {
-  response.json([
-    {
-      topic: "Web-based Mobile App Development",
-      location: "Hendon",
-      price: 100,
-    },
-    { topic: "Business Intelligence", location: "Colindale", price: 80 },
-    {
-      topic: "Strategic Information Systems",
-      location: "Brent Cross",
-      price: 90,
-    },
-    {
-      topic: "Advanced Web Development with Big Data",
-      location: "Golders Green",
-      price: 120,
-    },
-  ]);
+app.use((err, req, res, next) => {
+  console.log("Error: ", err);
+  res.status(500).send("An error occurred, please try again later.");
 });
 
-app.get("/user", (request, response) => {
-  response.json([{ email: "user@email.com", password: "mypassword" }]);
-});
+connectToDb()
+  .then(() => {
+    app.listen(process.env.APP_PORT || 3000, () =>
+      console.log("Server is running")
+    );
+  })
+  .catch((err) => {
+    console.log("Error starting server: ", err);
+  });
 
-app.listen(process.env.APP_PORT || 3000, () =>
-  console.log("server is running")
-);
+app.get("/lessons", async (req, res, next) => {
+  try {
+    const db = getDb();
+    const collection = db.collection("lessons");
+    const items = await collection.find({}).toArray();
+    res.send(items);
+  } catch (err) {
+    next(err);
+  }
+});

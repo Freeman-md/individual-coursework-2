@@ -1,24 +1,27 @@
 const { MongoClient, ServerApiVersion } = require("mongodb");
-const lessons = require("./lessons");
 
-const uri =
-  "mongodb+srv://Freemancodz:UENXZgr2RSAMkJgg@web-coursework-2.vjqikya.mongodb.net/?retryWrites=true&w=majority";
-const client = new MongoClient(uri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  serverApi: ServerApiVersion.v1,
-});
+let connection;
 
-client
-  .connect()
-  .then(() => {
-    const db = client.db("coursework");
-    const collection = db.collection("lessons");
+const uri = 'mongodb+srv://Freemancodz:UENXZgr2RSAMkJgg@web-coursework-2.vjqikya.mongodb.net/?retryWrites=true&w=majority'
 
-    collection.insertMany(lessons, (err, result) => {
-        if (err) console.log(err)
-        else console.log(`Inserted ${result.insertedCount} items into the collection`)
-    });
-    
-  })
-  .catch((err) => console.log(err))
+const connectToDb = async () => {
+    try {
+      connection = await MongoClient.connect(
+        uri,
+        { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1, }
+      );
+      console.log("Connected to MongoDB Atlas");
+    } catch (err) {
+      console.log("Error connecting to MongoDB Atlas: ", err);
+      throw err;
+    }
+};
+
+const getDb = () => {
+    if (!connection) {
+      throw new Error("Call connectToDb() before calling getDb()");
+    }
+    return connection.db('coursework');
+  };
+
+  module.exports = { connectToDb, getDb }
