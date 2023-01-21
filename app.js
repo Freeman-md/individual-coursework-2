@@ -8,7 +8,7 @@ const logger = require("./logger");
 const app = express();
 
 app.use(express.static("public"));
-app.use(logger)
+app.use(logger);
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -27,6 +27,19 @@ connectToDb()
     console.log("Error starting server: ", err);
   });
 
+const updateLesson = (lessonId, spaces) => {
+  const db = getDb();
+  const collection = db.collection("lessons");
+
+  collection.findOneAndUpdate(
+    { _id: ObjectId(lessonId) },
+    { $inc: { spaces: -spaces } },
+    (err, result) => {
+      if (err) throw err;
+    }
+  );
+};
+
 app.get("/lessons", async (req, res, next) => {
   try {
     const db = getDb();
@@ -40,35 +53,28 @@ app.get("/lessons", async (req, res, next) => {
 
 app.post("/orders", async (req, res, next) => {
   try {
-    const order = req.body
+    const order = req.body;
 
     const db = getDb();
     const collection = db.collection("orders");
-    
-    collection.insertOne(order, (err, result) => {
-      if (err) throw err
 
-      res.json(result)
-    })
+    collection.insertOne(order, (err, result) => {
+      if (err) throw err;
+
+      updateLesson(order.lesson_id, order.spaces);
+
+      res.json(result);
+    });
   } catch (err) {
     next(err);
   }
 });
 
 app.put("/lessons/:id", (req, res) => {
-  const lessonId = req.params.id
-  const spaces = req.body.spaces
+  const lessonId = req.params.id;
+  const spaces = req.body.spaces;
 
-  const db = getDb();
-  const collection = db.collection("lessons");
+  updateLesson(lessonId, spaces);
 
-  collection.findOneAndUpdate(
-    { _id: ObjectId(lessonId) },
-    { $inc: { 'spaces': -spaces } },
-    (err, result) => {
-      if (err) throw err 
-      
-      res.send("Lesson updated successfully")
-  })
-  
-})
+  res.send("Lesson updated successfully");
+});
