@@ -42,9 +42,21 @@ const updateLesson = (lessonId, spaces) => {
 
 app.get("/lessons", async (req, res, next) => {
   try {
+    const searchText = req.query.search
+    let query = {}
+
+    if (searchText) {
+      query = {
+        $or: [
+          { subject: { $regex: searchText, $options: 'i' } },
+          { location: { $regex: searchText, $options: 'i' } }
+        ]
+      }
+    }
+
     const db = getDb();
     const collection = db.collection("lesson");
-    const items = await collection.find({}).toArray();
+    const items = await collection.find(query).toArray();
     res.send(items);
   } catch (err) {
     next(err);
