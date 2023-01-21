@@ -1,10 +1,12 @@
 const express = require("express");
 const cors = require("cors");
 const { connectToDb, getDb } = require("./db");
+const logger = require("./logger");
 
 const app = express();
 
 app.use(express.static("public"));
+app.use(logger)
 app.use(cors());
 
 app.use((err, req, res, next) => {
