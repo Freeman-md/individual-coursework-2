@@ -1,4 +1,4 @@
-# groupwork-2
+# Individual Coursework 1
 
 Github Repository for Vue App:  https://github.com/Freeman-md/coursework-1.github.io
 Github Pages Link for Vue App:  https://freeman-md.github.io/coursework-1.github.io/
