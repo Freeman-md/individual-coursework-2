@@ -1,5 +1,4 @@
 const express = require("express");
-const cors = require("cors");
 const bodyParser = require("body-parser");
 const { ObjectId } = require("mongodb");
 const { connectToDb, getDb } = require("./db");
@@ -10,7 +9,12 @@ const app = express();
 app.use(express.static("public"));
 app.use(logger);
 app.use(bodyParser.json());
-app.use(cors());
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 app.use((err, req, res, next) => {
   console.log("Error: ", err);
@@ -20,7 +24,7 @@ app.use((err, req, res, next) => {
 connectToDb()
   .then(() => {
     app.listen(process.env.APP_PORT || 3000, () =>
-      console.log("Server is running")
+      console.log(`Server is running on port ${process.env.APP_PORT || 3000}`)
     );
   })
   .catch((err) => {
@@ -57,6 +61,7 @@ app.get("/lessons", async (req, res, next) => {
     const db = getDb();
     const collection = db.collection("lesson");
     const items = await collection.find(query).toArray();
+    
     res.send(items);
   } catch (err) {
     next(err);
@@ -73,7 +78,7 @@ app.post("/orders", async (req, res, next) => {
     collection.insertOne(order, (err, result) => {
       if (err) throw err;
 
-      updateLesson(order.lesson_id, order.spaces);
+      // updateLesson(order.lesson_id, order.spaces);
 
       res.json(result);
     });
