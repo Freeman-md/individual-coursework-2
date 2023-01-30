@@ -23,8 +23,8 @@ app.use((err, req, res, next) => {
 
 connectToDb()
   .then(() => {
-    app.listen(process.env.APP_PORT || 3000, () =>
-      console.log(`Server is running on port ${process.env.APP_PORT || 3000}`)
+    app.listen(process.env.PORT, () =>
+      console.log(`Server is running on port ${process.env.PORT}`)
     );
   })
   .catch((err) => {
