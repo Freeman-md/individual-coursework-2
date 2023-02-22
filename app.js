@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const { ObjectId } = require("mongodb");
 const { connectToDb, getDb } = require("./db");
+require('dotenv').config();
 const logger = require("./logger");
 
 const app = express();
