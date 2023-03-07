@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const cors = require("cors")
 const { ObjectId } = require("mongodb");
 const { connectToDb, getDb } = require("./db");
 require('dotenv').config();
@@ -10,6 +11,7 @@ const app = express();
 app.use(express.static("public"));
 app.use(logger);
 app.use(bodyParser.json());
+app.use(cors())
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
